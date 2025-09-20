@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -37,7 +37,12 @@ const AccordionComponent = ({
   const borderClass = colorMap[color].border;
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut", delay: 0 }}
+      // viewport={{ once: false }}
+    >
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="space-y-5">
           <AccordionTrigger
@@ -68,7 +73,7 @@ const AccordionComponent = ({
           </motion.div>
         </AccordionItem>
       </Accordion>
-    </div>
+    </motion.div>
   );
 };
 

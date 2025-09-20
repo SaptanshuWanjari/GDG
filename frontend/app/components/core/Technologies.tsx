@@ -57,12 +57,17 @@ const technologies = [
 
 const Technologies = () => {
   return (
-    <section className="mb-20">
+    <motion.section
+      className="mb-20"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeInOut", delay: 0 }}
+    >
       <div className="flex flex-col items-center justify-center mb-10 px-10">
         <h1 className="divider text-[70px] font-bold text-main text-center mb-4">
           Technologies
         </h1>
-        <p className="text-center text-main text-[32px] mb-8">
+        <p className="text-center text-main text-[34px] mt-8 mb-8">
           Domains That Excite Us to Collaborate and Teach
         </p>
       </div>
@@ -71,7 +76,12 @@ const Technologies = () => {
         className="relative overflow-hidden"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{
+          type: "spring",
+          stiffness: 100,
+          damping: 15,
+          duration: 0.6,
+        }}
       >
         <Carousel
           className="w-full mx-auto"
@@ -79,40 +89,78 @@ const Technologies = () => {
             align: "center",
             loop: true,
             skipSnaps: false,
-            dragFree: false,
+            dragFree: true,
           }}
         >
-          <motion.div layout>
-            <CarouselContent className="flex transition-all duration-500 ease-in-out">
-              {technologies.map((tech) => (
-                <CarouselItem
-                  key={tech.name}
-                  className="basis-1/4 flex items-center justify-center px-2"
+          <CarouselContent
+            className="flex transition-transform duration-300 ease-out"
+            style={{
+              willChange: "transform",
+              backfaceVisibility: "hidden",
+              perspective: "1000px",
+            }}
+          >
+            {technologies.map((tech, index) => (
+              <CarouselItem
+                key={tech.name}
+                className="basis-1/4 flex items-center justify-center px-2"
+              >
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    scale: 0.8,
+                    y: 20,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.8,
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 20,
+                    delay: index * 0.1, // Staggered animation
+                  }}
+                  whileHover={{
+                    scale: 1.05,
+                    transition: {
+                      type: "spring",
+                      stiffness: 300,
+                    },
+                  }}
+                  whileTap={{
+                    scale: 0.95,
+                    transition: {
+                      type: "spring",
+                      stiffness: 300,
+                    },
+                  }}
                 >
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0.6 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    whileHover={{ scale: 1.05, transition: { duration: 0.3 } }}
-                  >
-                    <Card
-                      img={tech.icon}
-                      title={tech.name}
-                      content={tech.content}
-                    />
-                  </motion.div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </motion.div>
-          <CarouselPrevious className="left-4" />
-          <CarouselNext className="right-4" />
+                  <Card
+                    img={tech.icon}
+                    title={tech.name}
+                    content={tech.content}
+                  />
+                </motion.div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-4 hover:bg-primary/10 transition-colors" />
+          <CarouselNext className="right-4 hover:bg-primary/10 transition-colors" />
         </Carousel>
-        {/* Blur overlay for side items */}
-        <div className="absolute left-0 top-0 w-1/6 h-full bg-gradient-to-r from-white via-white/50 to-transparent pointer-events-none blur-[1px]" />
-        <div className="absolute right-0 top-0 w-1/6 h-full bg-gradient-to-l from-white via-white/50 to-transparent pointer-events-none blur-[1px]" />
+
+        {/* Improved blur overlay */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute left-0 top-0 w-1/6 h-full bg-gradient-to-r from-background via-background/50 to-transparent" />
+          <div className="absolute right-0 top-0 w-1/6 h-full bg-gradient-to-l from-background via-background/50 to-transparent" />
+        </div>
       </motion.div>
-    </section>
+    </motion.section>
   );
 };
 

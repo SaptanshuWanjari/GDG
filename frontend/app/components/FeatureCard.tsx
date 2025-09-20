@@ -1,7 +1,7 @@
+"use client";
 import React from "react";
 import Image from "next/image";
-import { Separator } from "@/components/ui/separator";
-
+import { motion } from "framer-motion";
 const variants = {
   mission: {
     title: "Our Mission",
@@ -34,7 +34,12 @@ const FeatureCard = ({
   reverse?: boolean;
 }) => {
   return (
-    <div className="p-2 px-15 w-full flex justify-center flex-col ">
+    <motion.div
+      className="p-2 px-15 w-full flex justify-center flex-col "
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut", delay: 0}}
+    >
       <h1
         className={`text-[50px] border-b-${variants[variant].color}  text-main font-bold text-center`}
       >
@@ -74,7 +79,7 @@ const FeatureCard = ({
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

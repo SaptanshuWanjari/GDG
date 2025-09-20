@@ -1,5 +1,8 @@
+"use client";
 import React from "react";
 import AccordionComponent from "../AccordionComponent";
+import { motion } from "framer-motion";
+
 const questions = [
   {
     q: "What is GDG?",
@@ -29,7 +32,12 @@ const questions = [
 ];
 const Faq = () => {
   return (
-    <div className="w-full flex flex-col items-center justify-center py-14 bg-white text-black">
+    <motion.div
+      className="w-full flex flex-col items-center justify-center py-14 bg-white text-black"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut", delay: 0.2 }}
+    >
       <h1 className="text-main text-[70px] font-bold my-15">FAQs</h1>
       {questions.map((item, index) => (
         <AccordionComponent
@@ -39,7 +47,7 @@ const Faq = () => {
           color={item.color as "red" | "green" | "blue" | "yellow"}
         />
       ))}
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,9 +1,10 @@
+"use client";
 import React from "react";
 import Image from "next/image";
-
 const Hero = () => {
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center bg-white">
+      {/* main content */}
       <div className="flex flex-col items-center justify-center text-center gap-6 flex-1">
         <span>
           <span className="flex items-center justify-center">
