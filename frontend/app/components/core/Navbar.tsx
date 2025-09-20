@@ -14,19 +14,19 @@ const Navbar = () => {
   }, [darkMode]);
 
   return (
-    <div className="navbar   shadow-md h-20 w-full bg-white flex items-center px-4 border-b-1 border-gray-200 text-gray-500">
-      <div className="navbar-start flex items-center gap-2">
+    <div className="navbar   shadow-md h-20 w-full bg-white flex items-center px-10 border-b-1 border-gray-200 text-gray-500">
+      <div className="navbar-start flex items-center gap-5">
         <Image
           src="/gdg.svg"
           alt="logo"
-          width={40}
-          height={40}
+          width={70}
+          height={70}
           className="!border-none"
         />
-        <h1>GDG RCOEM</h1>
+        <h1 className="text-2xl">GDG RCOEM</h1>
       </div>
-      <div className="navbar-end gap-5 ml-auto ">
-        <Link href="#" className="link link-hover">
+      <div className="navbar-end text-xl gap-5 ml-auto ">
+        <Link href="#" className=" link link-hover">
           Home
         </Link>
         <Link href="#" className="link link-hover">
@@ -48,6 +48,7 @@ const Navbar = () => {
             onChange={() => setDarkMode((prev) => !prev)}
           />
 
+          {/* theme controls */}
           <svg
             aria-label="sun"
             xmlns="http://www.w3.org/2000/svg"

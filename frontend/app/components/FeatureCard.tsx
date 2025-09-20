@@ -66,7 +66,7 @@ const FeatureCard = ({
           }}
         >
           <p
-            className={`text-main font-bold text-xl ${
+            className={`text-main font-bold text-xl w-[80%] ${
               reverse ? "text-left" : "text-right"
             } w-[60%] leading-relaxed`}
           >

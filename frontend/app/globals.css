@@ -1,9 +1,22 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "daisyui" {
-    themes: all , light --default, dark --prefersdark;
+  themes: all, light --default, dark --prefersdark;
+}
+
+@font-face {
+  font-family: "Product Sans";
+  src: url("/fonts/ProductSans-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body,
+html,
+* {
+  font-family: "Product Sans", Arial, sans-serif !important;
 }
 
 .text-main {
-    @apply text-[#5F5F5F];
+  @apply text-[#5F5F5F];
 }
