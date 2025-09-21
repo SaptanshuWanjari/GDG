@@ -24,7 +24,7 @@ export default function Home() {
         </section>
 
         <section className="mb-20">
-          <div className="flex justify-center items-start gap-10 py-16 bg-white">
+          <div className="flex flex-wrap justify-center items-start gap-8 md:gap-10 py-10 md:py-16 bg-background px-4">
             <Stats label="Years" value={"03+"} />
             <Stats label="Events" value={"10+"} />
             <Stats label="Community Members" value={"1K+"} />
@@ -32,7 +32,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mb-20">
+        <section className="">
           <Technologies />
         </section>
 

@@ -1,37 +1,45 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import QuarterRing from "./QuarterRing";
+
 type Props = {
   value: string;
   label: string;
 };
+
 const Stats = ({ value, label }: Props) => {
   return (
-    <div className="flex flex-col items-center justify-start w-64 min-h-[20rem]">
+    <div className="flex flex-col items-center justify-start w-52 sm:w-56 md:w-64 min-h-[18rem]">
+      {/* Ring container with custom QuarterRing */}
       <motion.div
-        className="w-52 aspect-square relative"
-        style={{
-          backgroundImage: "url(/ring.svg)",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        className="w-44 sm:w-48 md:w-52 aspect-square relative"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeInOut", delay: 0 }}
       >
-        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] font-bold text-main text-center w-full">
-          {value}
-        </span>
+        {/* Custom 4-quarter ring */}
+        <QuarterRing size={208} strokeWidth={12} className="w-full h-full" />
+
+        {/* Value positioned in center */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-foreground drop-shadow-sm">
+            {value}
+          </span>
+        </div>
       </motion.div>
-      <motion.span
-        className="font-sans text-4xl font-normal text-black text-center mt-4 max-w-[12rem] break-words hyphens-none"
+
+      {/* Label */}
+      <motion.div
+        className="mt-4"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeInOut", delay: 0.2 }}
       >
-        {label}
-      </motion.span>
+        <span className="font-sans text-xl sm:text-2xl font-semibold text-center max-w-[12rem] text-foreground block px-2">
+          {label}
+        </span>
+      </motion.div>
     </div>
   );
 };

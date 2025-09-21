@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 
 // Types and Interfaces
@@ -47,7 +47,7 @@ const parseChildren = (children: React.ReactNode): LayoutSection => {
 
 // Sub-components
 const Header: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <header className="w-full bg-white border-b border-gray-200 shadow-sm">
+  <header className="w-full bg-background border-b border-gray-200 shadow-sm text-foreground">
     {children}
   </header>
 );
@@ -58,7 +58,7 @@ const Sidebar: React.FC<{
   className?: string;
 }> = ({ children, width, className = "" }) => (
   <aside
-    className={`${width} bg-gray-50 border-r border-gray-200 ${className}`}
+    className={`${width} bg-background border-r border-gray-200 text-foreground ${className}`}
   >
     {children}
   </aside>
@@ -69,13 +69,15 @@ const MainContent: React.FC<{
   width: string;
   className?: string;
 }> = ({ children, width, className = "" }) => (
-  <main className={`${width} flex flex-col flex-1 ${className}`}>
+  <main
+    className={`${width} flex flex-col flex-1 bg-background text-foreground ${className}`}
+  >
     <div className="flex-1 p-6">{children}</div>
   </main>
 );
 
 const Footer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <footer className="w-full bg-gray-100 border-t border-gray-200 p-4">
+  <footer className="w-full bg-background border-t border-gray-200 p-4 text-foreground">
     {children}
   </footer>
 );

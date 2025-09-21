@@ -33,20 +33,22 @@ const questions = [
 const Faq = () => {
   return (
     <motion.div
-      className="w-full flex flex-col items-center justify-center py-14 bg-white text-black"
+      className="w-full flex flex-col items-center justify-center py-12 sm:py-14 bg-background text-foreground px-4"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut", delay: 0.2 }}
     >
-      <h1 className="text-main text-[70px] font-bold my-15">FAQs</h1>
-      {questions.map((item, index) => (
-        <AccordionComponent
-          key={index}
-          trigger={item.q}
-          content={item.a}
-          color={item.color as "red" | "green" | "blue" | "yellow"}
-        />
-      ))}
+      <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[70px] font-bold my-6 sm:my-10 text-center">FAQs</h1>
+      <div className="w-full max-w-3xl space-y-4">
+        {questions.map((item, index) => (
+          <AccordionComponent
+            key={index}
+            trigger={item.q}
+            content={item.a}
+            color={item.color as "red" | "green" | "blue" | "yellow"}
+          />
+        ))}
+      </div>
     </motion.div>
   );
 };

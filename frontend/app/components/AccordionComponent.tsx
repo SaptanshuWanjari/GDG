@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
+import React from "react";
 import {
   Accordion,
   AccordionContent,
@@ -41,12 +41,14 @@ const AccordionComponent = ({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut", delay: 0 }}
-      // viewport={{ once: false }}
     >
       <Accordion type="single" collapsible>
-        <AccordionItem value="item-1" className="space-y-5">
+        <AccordionItem value="item-1" className="space-y-3 border-b-0">
           <AccordionTrigger
-            className="border-8 text-main font-bold text-2xl text-center border-gray-200 bg-white rounded-full p-5 w-180 "
+            className={`w-full max-w-3xl mx-auto border-4 sm:border-8 text-foreground font-bold text-lg sm:text-xl md:text-2xl text-center rounded-full px-4 py-4 sm:px-6 sm:py-5 ${color} ${
+              // Use subtle gray for border in light mode, complementary accent in dark mode
+              "border-gray-300 dark:border-complementary/60 bg-card hover:border-gray-400 dark:hover:border-complementary/80 hover:shadow-lg dark:hover:shadow-complementary/20 transition-all duration-300"
+            }`}
             color={arrowClass}
           >
             {trigger}
@@ -58,13 +60,13 @@ const AccordionComponent = ({
             variants={variants}
           >
             <AccordionContent>
-              <div className="max-w-xl mx-auto my-3 flex">
+              <div className="max-w-3xl mx-auto my-3 flex">
                 {/* Left border */}
-                <div className={`w-[9px] rounded-l-lg ${borderClass}`}></div>
+                <div className={`w-[9px] rounded-l-full ${borderClass}`}></div>
 
                 {/* Outer container with text */}
-                <div className="flex-1 border-9 border-gray-300 rounded-r-3xl p-5 bg-white shadow-md text-gray-700 text-sm leading-relaxed font-sans">
-                  <p className=" text-[#5F5F5F] text-[18px] font-medium ">
+                <div className="flex-1 border-4 sm:border-[8px] rounded-r-4xl p-4 sm:p-5 bg-accordion-bg text-foreground text-sm leading-relaxed font-sans border-gray-300 dark:border-complementary/60 hover:border-gray-400 dark:hover:border-complementary/80 transition-colors duration-300">
+                  <p className="text-muted-foreground text-base sm:text-[18px] font-medium">
                     {content}
                   </p>
                 </div>
