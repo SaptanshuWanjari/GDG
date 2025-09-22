@@ -1,25 +1,12 @@
 import { NextResponse } from "next/server";
 
+// This API route is deprecated - use NextAuth signOut instead
 export async function POST() {
-  try {
-    const response = NextResponse.json({
-      message: "Logout successful",
-    });
-
-    response.cookies.set("auth-token", "", {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 0,
-      path: "/",
-    });
-
-    return response;
-  } catch (error) {
-    console.error("Logout error:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    {
+      message:
+        "This logout endpoint is deprecated. Please use NextAuth signOut.",
+    },
+    { status: 410 } // Gone
+  );
 }

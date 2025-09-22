@@ -1,54 +1,32 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated, getUserFromToken } from "@/lib/cookies";
+import { useSession } from "next-auth/react";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { status } = useSession();
 
+  // status: 'loading' | 'authenticated' | 'unauthenticated'
   useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = isAuthenticated();
-      console.log("ProtectedLayout: Authentication check:", authenticated);
+    if (status === "unauthenticated") {
+      if (typeof window !== "undefined") router.push("/login");
+    }
+  }, [status, router]);
 
-      if (authenticated) {
-        const user = getUserFromToken();
-        console.log("ProtectedLayout: User data from token:", user);
-      }
-
-      if (!authenticated) {
-        console.log("ProtectedLayout: Not authenticated, redirecting to login");
-        router.push("/login");
-        return;
-      }
-
-      setIsLoggedIn(true);
-      setIsLoading(false);
-    };
-
-    // Initial check with a small delay to ensure cookies are loaded
-    setTimeout(checkAuth, 100);
-
-    // Set up an interval to periodically check auth status (less frequent)
-    const interval = setInterval(checkAuth, 10000); // Increased to 10 seconds
-
-    return () => clearInterval(interval);
-  }, [router]);
-
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     );
   }
-
-  if (!isLoggedIn) {
-    return null; // Router push will handle redirect
+//! if not authenticated, do nothing
+  if (status === "unauthenticated") {
+    return null;
   }
 
+  //? If authenticated
   return <div>{children}</div>;
 };
 

@@ -34,8 +34,6 @@ interface User {
 
 interface UserManagementTableProps {
   users: User[];
-  onPromoteUser: (userId: string) => void;
-  onDemoteUser: (userId: string) => void;
   loading?: boolean;
 }
 
@@ -43,8 +41,6 @@ const columnHelper = createColumnHelper<User>();
 
 const UserManagementTable: React.FC<UserManagementTableProps> = ({
   users,
-  onPromoteUser,
-  onDemoteUser,
   loading = false,
 }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -160,48 +156,8 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
           </div>
         ),
       }),
-      columnHelper.display({
-        id: "actions",
-        header: "Actions",
-        cell: ({ row }) => {
-          const user = row.original;
-
-          if (user.role === "owner") {
-            return (
-              <span className="text-xs text-muted-foreground px-3 py-1 rounded bg-muted">
-                System Owner
-              </span>
-            );
-          }
-
-          return (
-            <div className="flex space-x-2">
-              {user.role === "user" ? (
-                <Button
-                  size="sm"
-                  onClick={() => onPromoteUser(user._id)}
-                  disabled={loading}
-                  className="h-8 px-3"
-                >
-                  Promote to Admin
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onDemoteUser(user._id)}
-                  disabled={loading}
-                  className="h-8 px-3"
-                >
-                  Demote to User
-                </Button>
-              )}
-            </div>
-          );
-        },
-      }),
     ],
-    [onPromoteUser, onDemoteUser, loading]
+    []
   );
 
   const table = useReactTable({

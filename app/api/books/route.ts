@@ -1,8 +1,7 @@
 import clientPromise from "@/app/db/mongo";
 import { Book } from "@/app/types/book";
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+import { getServerAuth } from "@/lib/auth";
 
 // GET - Fetch all books
 export async function GET() {
@@ -28,38 +27,16 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     // Check authentication and admin role
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
+    const auth = await getServerAuth();
 
-    if (!token) {
+    if (!auth.isAuthenticated || !auth.user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      return NextResponse.json(
-        { error: "Server misconfiguration" },
-        { status: 500 }
-      );
-    }
-
-    interface JWTPayload {
-      userId: string;
-      email: string;
-      name: string;
-      isAdmin: boolean;
-      isOwner: boolean;
-      iat?: number;
-      exp?: number;
-    }
-
-    const decoded = jwt.verify(token, secret) as JWTPayload;
-
-    // Check if user is admin or owner
-    if (!decoded.isAdmin && !decoded.isOwner) {
+    if (!auth.user.isAdmin) {
       return NextResponse.json(
         { error: "Admin access required" },
         { status: 403 }

@@ -12,25 +12,22 @@ import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-import { getUserFromToken, isAuthenticated } from "@/lib/cookies";
+import { useSession } from "next-auth/react";
 
 import {
   Form,
   FormControl,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -44,31 +41,20 @@ interface UserData {
 
 const Page = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    const getUserData = () => {
-      const authenticated = isAuthenticated();
-      setIsLoggedIn(authenticated);
-
-      if (authenticated) {
-        const user = getUserFromToken();
-        if (user) {
-          setUserData({
-            email: user.email,
-            name: user.name,
-            isAdmin: user.isAdmin,
-            isOwner: user.isOwner,
-          });
-        }
-      } else {
-        setUserData(null);
-      }
-    };
-
-    getUserData();
-  }, []);
+    if (status === "authenticated" && session?.user) {
+      setUserData({
+        email: session.user.email,
+        name: session.user.name,
+        isAdmin: session.user.isAdmin,
+        isOwner: session.user.isOwner,
+      });
+    } else {
+      setUserData(null);
+    }
+  }, [status, session]);
   const formSchema = z.object({
     name: z.string().min(2).max(100),
     email: z.string().min(5).max(100).email(),
@@ -133,7 +119,7 @@ const Page = () => {
   };
   return (
     <ProtectedLayout>
-      <div className="p-10 w-[50%] mx-auto flex flex-col justify-center">
+      <div className="px-4 py-6 sm:px-6 md:py-10 w-full max-w-3xl mx-auto flex flex-col justify-center">
         <section className="mb-5">
           <h1 className="text-3xl font-bold text-foreground">Profile</h1>
           <p className="text-muted-foreground">
@@ -153,15 +139,15 @@ const Page = () => {
                 settings.
               </p>
             </CardTitle>
-            <CardAction className="space-x-2">
+            <CardAction className="space-x-2 flex flex-col sm:flex-row sm:items-center gap-2">
               <Button
-                className="bg-gray-100 text-muted-foreground hover:bg-gray-200 hover:text-foreground cursor-pointer"
+                className="bg-gray-100 text-muted-foreground hover:bg-gray-200 hover:text-foreground cursor-pointer w-full sm:w-auto"
                 onClick={() => setIsEditing(!isEditing)}
               >
-                <BiPencil size={30} />
-                Edit
+                <BiPencil size={20} />
+                <span className="ml-2">Edit</span>
               </Button>
-              <Button className="bg-red-600 text-white hover:bg-red-700 cursor-pointer">
+              <Button className="bg-red-600 text-white hover:bg-red-700 cursor-pointer w-full sm:w-auto">
                 Delete
               </Button>
             </CardAction>
@@ -191,7 +177,7 @@ const Page = () => {
                           type="text"
                           placeholder="Enter your name"
                           disabled={!isEditing}
-                          className={`focus:ring-0 text-[15px] ${
+                          className={`focus:ring-0 text-sm md:text-[15px] w-full ${
                             !isEditing
                               ? "bg-transparent border-0 text-black placeholder:text-black"
                               : "text-black placeholder:text-primary"
@@ -220,7 +206,7 @@ const Page = () => {
                           type="email"
                           disabled={!isEditing}
                           placeholder="Enter your email"
-                          className={`focus:ring-0 text-[15px] ${
+                          className={`focus:ring-0 text-sm md:text-[15px] w-full ${
                             !isEditing
                               ? "bg-transparent border-0 text-black placeholder:text-black"
                               : "text-black placeholder:text-primary"
@@ -264,7 +250,7 @@ const Page = () => {
               </form>
             </Form>
           </CardContent>
-          <CardFooter className="flex justify-end space-x-2">
+          <CardFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
             {isEditing && (
               <>
                 <Button
@@ -276,14 +262,14 @@ const Page = () => {
                     });
                     setIsEditing(false);
                   }}
-                  className="border-muted-foreground"
+                  className="border-muted-foreground w-full sm:w-auto"
                 >
-                  <BiX size={20} />
-                  Cancel
+                  <BiX size={18} />
+                  <span className="ml-2">Cancel</span>
                 </Button>
-                <Button type="submit">
-                  <BiSave size={20} />
-                  Save
+                <Button type="submit" className="w-full sm:w-auto">
+                  <BiSave size={18} />
+                  <span className="ml-2">Save</span>
                 </Button>
               </>
             )}

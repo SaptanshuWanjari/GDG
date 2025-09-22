@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -51,30 +50,30 @@ const Page = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        toast.error(result.message || "Login failed");
+      if (result?.error) {
+        toast.error("Invalid email or password");
         return;
       }
 
-      toast.success("Login successful!");
+      // Get session to check user role and redirect accordingly
+      const session = await getSession();
+      if (session?.user) {
+        toast.success("Login successful!");
 
-      // Redirect based on user role
-      if (result.user.isOwner) {
-        router.push("/owner");
-      } else if (result.user.isAdmin) {
-        router.push("/admin");
-      } else {
-        router.push("/");
+        // Redirect based on user role
+        if (session.user.isOwner) {
+          router.push("/owner");
+        } else if (session.user.isAdmin) {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
       }
     } catch (error) {
       console.error("Login error:", error);

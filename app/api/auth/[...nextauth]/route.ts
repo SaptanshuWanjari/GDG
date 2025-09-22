@@ -1,63 +1,214 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import CredentialsProvider from "next-auth/providers/credentials";
 import clientPromise from "@/app/db/mongo";
+import bcrypt from "bcryptjs";
 
 export const authOptions: AuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        try {
+          const client = await clientPromise;
+          const db = client.db("LibraryManagement");
+
+          let user = null;
+          let isAdmin = false;
+          let isOwner = false;
+
+          //! hardcoded admin and owner accounts
+          // Check for special admin/owner accounts first
+          if (
+            credentials.email === "admin@admin.com" ||
+            credentials.email === "owner@library.com"
+          ) {
+            let admin = await db
+              .collection("admins")
+              .findOne({ email: credentials.email });
+
+            if (!admin) {
+              // Create admin/owner account if it doesn't exist
+              const hashedPassword = await bcrypt.hash(
+                credentials.email === "admin@admin.com"
+                  ? "admin123"
+                  : "owner123",
+                10
+              );
+
+              const newAdmin = {
+                email: credentials.email,
+                name:
+                  credentials.email === "admin@admin.com"
+                    ? "Admin User"
+                    : "Owner User",
+                password: hashedPassword,
+                isOwner: credentials.email === "owner@library.com",
+                createdAt: new Date(),
+              };
+
+              const result = await db.collection("admins").insertOne(newAdmin);
+              admin = { ...newAdmin, _id: result.insertedId };
+            }
+
+            // Verify password
+            const passwordMatch = await bcrypt.compare(
+              credentials.email === "admin@admin.com" ? "admin123" : "owner123",
+              admin.password
+            );
+
+            if (passwordMatch) {
+              user = admin;
+              isAdmin = true;
+              isOwner = admin.isOwner || false;
+            }
+          } else {
+            // Check admins collection first
+            const admin = await db
+              .collection("admins")
+              .findOne({ email: credentials.email });
+            if (admin) {
+              const passwordMatch = await bcrypt.compare(
+                credentials.password,
+                admin.password
+              );
+              if (passwordMatch) {
+                user = admin;
+                isAdmin = true;
+                isOwner = admin.isOwner || false;
+              }
+            } else {
+              // Check regular users collection
+              const regularUser = await db
+                .collection("users")
+                .findOne({ email: credentials.email });
+              if (regularUser) {
+                const passwordMatch = await bcrypt.compare(
+                  credentials.password,
+                  regularUser.password
+                );
+                if (passwordMatch) {
+                  user = regularUser;
+                  isAdmin = false;
+                  isOwner = false;
+                }
+              }
+            }
+          }
+
+          if (user) {
+            return {
+              id: user._id.toString(),
+              email: user.email,
+              name: user.name,
+              isAdmin,
+              isOwner,
+            };
+          }
+
+          return null;
+        } catch (error) {
+          console.error("Auth error:", error);
+          return null;
+        }
+      },
+    }),
   ],
   callbacks: {
-    async session({ session }) {
-      // Add custom user properties to session
-      if (session.user) {
-        const client = await clientPromise;
-        const db = client.db("LibraryManagement");
-
-        // Check if user is an admin
-        const admin = await db
-          .collection("admins")
-          .findOne({ email: session.user.email });
-        if (admin) {
-          session.user.isAdmin = true;
-          session.user.isOwner = admin.isOwner || false;
-          session.user.id = admin._id.toString();
-        } else {
-          // Check if user exists in regular users collection
-          const regularUser = await db
-            .collection("users")
-            .findOne({ email: session.user.email });
-          if (regularUser) {
-            session.user.isAdmin = false;
-            session.user.isOwner = false;
-            session.user.id = regularUser._id.toString();
-          } else {
-            // Create new user if doesn't exist
-            const newUser = {
-              name: session.user.name,
-              email: session.user.email,
-              image: session.user.image,
-              createdAt: new Date(),
-              isAdmin: false,
-              isOwner: false,
-            };
-            const result = await db.collection("users").insertOne(newUser);
-            session.user.id = result.insertedId.toString();
-            session.user.isAdmin = false;
-            session.user.isOwner = false;
-          }
-        }
+    async jwt({ token, user }) {
+      // Persist user data to token
+      if (user) {
+        token.isAdmin = user.isAdmin;
+        token.isOwner = user.isOwner;
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Send token properties to client
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.isAdmin = token.isAdmin as boolean;
+        session.user.isOwner = token.isOwner as boolean;
       }
       return session;
     },
-    async signIn() {
-      // Allow sign in
+    async signIn({ user, account, profile }) {
+      // When signing in with Google, ensure we persist the user to our users collection
+      try {
+        if (account?.provider === "google") {
+          const client = await clientPromise;
+          const db = client.db(process.env.MONGODB_DB || "LibraryManagement");
+
+          // Robust email extraction from user/profile
+          const profileAny = profile as unknown as Record<string, unknown>;
+          const getFirstEmail = (p: Record<string, unknown> | undefined) => {
+            if (!p) return null;
+            const e = p.email;
+            if (typeof e === "string" && e.length > 0) return e;
+            const emails = p.emails;
+            if (Array.isArray(emails) && emails.length > 0) {
+              const first = emails[0];
+              if (typeof first === "string") return first;
+              if (first && typeof first === "object" && "value" in (first as Record<string, unknown>)) {
+                const val = (first as Record<string, unknown>).value;
+                if (typeof val === "string") return val;
+              }
+            }
+            return null;
+          };
+
+          const email = (user && (user.email as string)) || getFirstEmail(profileAny) || null;
+
+          console.log("[nextauth] signIn callback - provider:", account.provider, "email:", email);
+
+          if (!email) {
+            console.warn("[nextauth] signIn: no email found in Google profile, skipping user upsert", { profile });
+            return true;
+          }
+
+          const existing = await db.collection("users").findOne({ email });
+          if (!existing) {
+            const insertRes = await db.collection("users").insertOne({
+              name: (user && user.name) || profileAny?.name || "",
+              email,
+              image: (user && user.image) || profileAny?.picture || null,
+              createdAt: new Date(),
+            });
+            console.log("[nextauth] signIn: inserted new user with id", insertRes.insertedId?.toString());
+          } else {
+            // update existing profile fields if missing
+            const updateRes = await db.collection("users").updateOne(
+              { email },
+              {
+                $set: {
+                  name: (user && user.name) || existing.name,
+                  image: (user && user.image) || existing.image,
+                },
+              }
+            );
+            console.log("[nextauth] signIn: updated existing user", { matchedCount: updateRes.matchedCount, modifiedCount: updateRes.modifiedCount });
+          }
+        }
+      } catch (err) {
+        console.error("Error upserting Google user:", err);
+      }
+
       return true;
     },
+    // (signIn handled above for Google upsert) fallback allow sign in for other providers
     async redirect({ baseUrl }) {
       // Redirect to base URL
       return baseUrl;
@@ -68,7 +219,7 @@ export const authOptions: AuthOptions = {
     error: "/login",
   },
   session: {
-    strategy: "database" as const,
+    strategy: "jwt" as const,
   },
 };
 

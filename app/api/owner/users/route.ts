@@ -1,33 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, ObjectId } from "mongodb";
-import jwt from "jsonwebtoken";
+import { getServerAuth } from "@/lib/auth";
 
 const uri = process.env.MONGODB_URI!;
 const client = new MongoClient(uri);
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Verify owner authentication
-    const token = request.cookies.get("auth-token")?.value;
-    if (!token) {
+    // Verify owner authentication via NextAuth
+    const auth = await getServerAuth();
+    if (!auth.isAuthenticated || !auth.user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      userId: string;
-      email: string;
-      name: string;
-      isAdmin: boolean;
-      isOwner: boolean;
-      iat?: number;
-      exp?: number;
-    };
-
-    // Check if user is owner (owners are also admins in our system)
-    if (!decoded.isOwner && !decoded.isAdmin) {
+    if (!auth.user.isOwner && !auth.user.isAdmin) {
       return NextResponse.json(
         { error: "Owner access required" },
         { status: 403 }
@@ -65,21 +54,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify owner authentication
-    const token = request.cookies.get("token")?.value;
-    if (!token) {
+    // Verify owner authentication via NextAuth
+    const auth = await getServerAuth();
+    if (!auth.isAuthenticated || !auth.user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      userId: string;
-      email: string;
-      role: string;
-    };
-    if (decoded.role !== "owner") {
+    if (!auth.user.isOwner) {
       return NextResponse.json(
         { error: "Owner access required" },
         { status: 403 }
@@ -138,7 +122,7 @@ export async function POST(request: NextRequest) {
         name: currentUser.name,
         role: "admin" as const,
         createdAt: currentUser.createdAt,
-        promotedBy: decoded.userId,
+        promotedBy: auth.user.id,
         updatedAt: new Date(),
       };
 

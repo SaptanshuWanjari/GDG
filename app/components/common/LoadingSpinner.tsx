@@ -1,8 +1,6 @@
 import React from "react";
 
 export default function LoadingSpinner({ className }: { className?: string }) {
-  // Render an inline element (span) so it can be safely used inside <p>
-  // Use Tailwind classes for sizing/colour via the optional `className` prop.
   return (
     <span
       className={`inline-flex items-center justify-center ${

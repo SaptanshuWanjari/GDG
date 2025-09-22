@@ -28,12 +28,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen`}
       >
         <AuthProvider>
-          <ConditionalNav />
-          {children}
-          <Toaster />
+          <div className="min-h-screen w-full">
+            <ConditionalNav />
+            {children}
+            <Toaster />
+          </div>
         </AuthProvider>
       </body>
     </html>

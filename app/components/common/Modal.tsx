@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { ImagePlusIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ const formSchema = z.object({
   publishedYear: z.string().min(4, {
     message: "Published year must be at least 4 characters.",
   }),
-  isbn: z.string().min(10, {
+  ISBN: z.string().min(10, {
     message: "ISBN must be at least 10 characters.",
   }),
   description: z.string().min(10, {
@@ -71,7 +72,7 @@ export default function Component({ open, onOpenChange }: ModalProps) {
           category: data.category,
           summary: data.description,
           publishedYear: data.publishedYear,
-          isbn: data.isbn,
+          ISBN: data.ISBN,
         }),
         credentials: "include",
       });
@@ -86,7 +87,6 @@ export default function Component({ open, onOpenChange }: ModalProps) {
       form.reset();
       onOpenChange?.(false);
 
-      // Refresh the page to show the new book
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -191,10 +191,10 @@ export default function Component({ open, onOpenChange }: ModalProps) {
                       </FormItem>
                     )}
                   />
-                  {/* isbn */}
+                  {/* ISBN */}
                   <FormField
                     control={form.control}
-                    name="isbn"
+                    name="ISBN"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="font-semibold">ISBN</FormLabel>
@@ -249,6 +249,7 @@ export default function Component({ open, onOpenChange }: ModalProps) {
             </Form>
           </div>
         </div>
+        {/* actions */}
         <DialogFooter className="border-t px-6 py-4">
           <DialogClose asChild>
             <Button type="button" variant="outline" className="cursor-pointer">
@@ -270,11 +271,10 @@ export default function Component({ open, onOpenChange }: ModalProps) {
 }
 
 const initialBgImage = [
-  { url: "/images/default-bg.jpg" }, // Replace with your default image path or leave empty
+  { url: "/images/default-bg.jpg" },
 ];
 
 function ProfileBg() {
-  // Static image handling (hooks removed)
   const currentImage = initialBgImage[0]?.url || null;
 
   return (
@@ -321,7 +321,7 @@ function ProfileBg() {
 }
 
 const initialAvatarImage = [
-  { url: "/images/default-avatar.jpg" }, // Replace with your default avatar image path or leave empty
+  { url: "/images/default-avatar.jpg" },
 ];
 
 function Avatar() {

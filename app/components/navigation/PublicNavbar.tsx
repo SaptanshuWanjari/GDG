@@ -1,7 +1,7 @@
 ﻿"use client";
 import { BiChevronDown } from "react-icons/bi";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BiBookBookmark } from "react-icons/bi";
@@ -16,61 +16,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, LogIn, UserPlus, BookOpen, Home } from "lucide-react";
-import { getUserFromToken, isAuthenticated } from "@/lib/cookies";
-
-interface UserData {
-  email?: string;
-  name?: string;
-  isAdmin?: boolean;
-  isOwner?: boolean;
-}
+import { useSession, signOut } from "next-auth/react";
 
 const PublicNavbar = () => {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const getUserData = () => {
-      const authenticated = isAuthenticated();
-      setIsLoggedIn(authenticated);
-
-      if (authenticated) {
-        const user = getUserFromToken();
-        if (user) {
-          setUserData({
-            email: user.email,
-            name: user.name,
-            isAdmin: user.isAdmin,
-            isOwner: user.isOwner,
-          });
-        }
-      } else {
-        setUserData(null);
-      }
-    };
-
-    getUserData();
-  }, []);
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
+  const user = session?.user;
 
   const handleLogout = async () => {
-    try {
-      const res = await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (res.ok) {
-        setIsLoggedIn(false);
-        setUserData(null);
-        window.location.href = "/";
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-      setIsLoggedIn(false);
-      setUserData(null);
-      window.location.href = "/";
-    }
+    await signOut({ redirect: true, callbackUrl: "/" });
   };
 
   const navLinks = [
@@ -153,26 +108,29 @@ const PublicNavbar = () => {
                     className="flex items-center gap-2 px-3 py-2"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>
-                        {userData?.name?.charAt(0).toUpperCase() ||
-                          userData?.email?.charAt(0).toUpperCase() ||
-                          "U"}
-                      </AvatarFallback>
+                      {user?.image ? (
+                        <AvatarImage src={user.image} />
+                      ) : (
+                        <AvatarFallback>
+                          {user?.name?.charAt(0).toUpperCase() ||
+                            user?.email?.charAt(0).toUpperCase() ||
+                            "U"}
+                        </AvatarFallback>
+                      )}
                     </Avatar>
                     <div className="hidden md:flex flex-col items-start">
                       <span className="text-sm font-medium">
-                        {userData?.name || userData?.email || "User"}
+                        {user?.name || user?.email || "User"}
                       </span>
                       <span className="text-xs text-gray-500 capitalize">
-                        {userData?.isOwner
+                        {user?.isOwner
                           ? "Owner"
-                          : userData?.isAdmin
+                          : user?.isAdmin
                           ? "Admin"
                           : "Member"}
                       </span>
                     </div>
-                    <BiChevronDown/>
+                    <BiChevronDown />
                   </Button>
                 </DropdownMenuTrigger>
 
@@ -190,7 +148,7 @@ const PublicNavbar = () => {
                     </Link>
                   </DropdownMenuItem>
 
-                  {(userData?.isAdmin || userData?.isOwner) && (
+                  {(user?.isAdmin || user?.isOwner) && (
                     <DropdownMenuItem asChild>
                       <Link
                         href="/admin"
@@ -202,7 +160,7 @@ const PublicNavbar = () => {
                     </DropdownMenuItem>
                   )}
 
-                  {userData?.isOwner && (
+                  {user?.isOwner && (
                     <DropdownMenuItem asChild>
                       <Link
                         href="/owner"

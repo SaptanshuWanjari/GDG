@@ -16,7 +16,7 @@ import {
   LogIn,
 } from "lucide-react";
 import { BiBookBookmark } from "react-icons/bi";
-import { isAuthenticated } from "@/lib/cookies";
+import { useSession } from "next-auth/react";
 
 interface Book {
   _id: string;
@@ -32,15 +32,36 @@ export default function Home() {
   const [featuredBooks, setFeaturedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { status } = useSession();
+  const [stats, setStats] = useState<{
+    totalBooks: number;
+    totalUsers: number;
+    avgRating?: number;
+  } | null>(null);
 
   useEffect(() => {
-    // Check authentication status
-    const checkAuth = () => {
-      const authenticated = isAuthenticated();
-      setIsLoggedIn(authenticated);
+    setIsLoggedIn(status === "authenticated");
+  }, [status]);
+
+  useEffect(() => {
+    // Fetch public stats (books, users) for homepage
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/owner/stats");
+        if (!res.ok) return;
+        const body = await res.json();
+        if (body?.success && body.stats) {
+          setStats({
+            totalBooks: body.stats.totalBooks || 0,
+            totalUsers: body.stats.totalUsers || 0,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+      }
     };
 
-    checkAuth();
+    fetchStats();
   }, []);
 
   useEffect(() => {
@@ -163,7 +184,7 @@ export default function Home() {
                     size="lg"
                     variant="outline"
                     asChild
-                    className="border-2 border-primary-foreground/40 hover:bg-primary-foreground text-primary-foreground hover:text-primary hover:scale-105 transition-all duration-300 backdrop-blur-sm px-8 py-4 text-lg font-semibold"
+                    className="border-2 border-primary-foreground/40 hover:bg-primary-foreground text-black hover:text-primary hover:scale-105 transition-all duration-300 backdrop-blur-sm px-8 py-4 text-lg font-semibold"
                   >
                     <Link href="/login" className="flex items-center gap-3">
                       <LogIn className="h-6 w-6" />
@@ -187,7 +208,7 @@ export default function Home() {
                     size="lg"
                     variant="outline"
                     asChild
-                    className="border-2 border-primary-foreground/40 hover:bg-primary-foreground text-primary-foreground hover:text-primary hover:scale-105 transition-all duration-300 backdrop-blur-sm px-8 py-4 text-lg font-semibold"
+                    className="border-2 border-primary-foreground/40 hover:bg-primary-foreground text-black  hover:text-primary hover:scale-105 transition-all duration-300 backdrop-blur-sm px-8 py-4 text-lg font-semibold"
                   >
                     <Link href="/profile" className="flex items-center gap-3">
                       <Users className="h-6 w-6" />
@@ -198,17 +219,6 @@ export default function Home() {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Bottom wave */}
-        <div className="absolute bottom-0 left-0 w-full">
-          <svg
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-            className="relative block w-full h-16 fill-card"
-          >
-            <path d="M0,0V60c0,0,200,40,600,40s600-40,600-40V0H0z"></path>
-          </svg>
         </div>
       </section>
 
@@ -349,7 +359,7 @@ export default function Home() {
                 <BookOpen className="h-10 w-10 text-primary-foreground group-hover:text-primary-foreground/80 transition-colors duration-300" />
               </div>
               <h3 className="text-4xl md:text-5xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300">
-                10,000+
+                {stats ? stats.totalBooks.toLocaleString() : "—"}
               </h3>
               <p className="text-primary-foreground/90 text-lg font-medium">
                 Books Available
@@ -360,7 +370,7 @@ export default function Home() {
                 <Users className="h-10 w-10 text-primary-foreground group-hover:text-primary-foreground/80 transition-colors duration-300" />
               </div>
               <h3 className="text-4xl md:text-5xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300">
-                5,000+
+                {stats ? stats.totalUsers.toLocaleString() : "—"}
               </h3>
               <p className="text-primary-foreground/90 text-lg font-medium">
                 Active Members
@@ -371,7 +381,9 @@ export default function Home() {
                 <Star className="h-10 w-10 text-primary-foreground group-hover:text-primary-foreground/80 transition-colors duration-300" />
               </div>
               <h3 className="text-4xl md:text-5xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300">
-                4.9/5
+                {stats && stats.avgRating
+                  ? stats.avgRating.toFixed(1) + "/5"
+                  : "4.9/5"}
               </h3>
               <p className="text-primary-foreground/90 text-lg font-medium">
                 User Rating
@@ -439,7 +451,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="/register"
-                    className="hover:underline transition-colors"
+                    className="hover:underline transition-colors "
                   >
                     Sign Up
                   </Link>

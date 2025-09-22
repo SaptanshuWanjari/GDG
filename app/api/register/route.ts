@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectMongoDB } from "@/app/db/mongo";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
   try {
@@ -68,19 +67,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      {
-        userId: result.insertedId,
-        email: newUser.email,
-        name: newUser.name,
-        isAdmin: false,
-        isOwner: false,
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" }
-    );
-
     // Create response with user data (excluding password)
     const response = NextResponse.json({
       message: "User registered successfully",
@@ -93,15 +79,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Set auth cookie
-    response.cookies.set("auth-token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
-
+    // NOTE: Do not set auth-token cookie here. Authentication is handled by NextAuth.
     return response;
   } catch (error) {
     console.error("Registration error:", error);
