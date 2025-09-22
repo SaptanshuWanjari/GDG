@@ -7,6 +7,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AdminNavbar from "@/app/components/navigation/AdminNavbar";
+import { BsBook } from "react-icons/bs";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
@@ -30,13 +31,19 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       icon: FiUsers,
       isActive: pathname === "/admin/users",
     },
+    {
+      href: "/admin/borrowed-books",
+      label: "Borrowed Books",
+      icon: BsBook,
+      isActive: pathname === "/admin/borrowed-books",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNavbar />
-      <div className="flex">
-        <aside className="w-60 min-h-screen bg-white border-r border-gray-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row">
+        <aside className="hidden sm:block w-60 min-h-screen bg-white border-r border-gray-200 shadow-sm">
           <div className="p-4">
             <nav className="space-y-1">
               {navItems.map((item) => {
@@ -64,7 +71,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </aside>
 
-        <main className="flex-1 bg-gray-50 p-6">{children}</main>
+        <main className="flex-1 bg-gray-50 p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );

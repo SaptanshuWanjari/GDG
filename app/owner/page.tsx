@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import ProtectedLayout from "@/app/components/ProtectedLayout";
+import ProtectedLayout from "@/app/components/layout/ProtectedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, BookOpen, Shield, TrendingUp } from "lucide-react";
 import UserManagementTable from "@/app/components/admin/UserManagementTable";
@@ -95,55 +95,10 @@ const OwnerDashboard = () => {
     }
   };
 
-  const promoteToAdmin = async (userId: string) => {
-    setActionLoading(true);
-    try {
-      const res = await fetch("/api/owner/promote", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, role: "admin" }),
-        credentials: "include",
-      });
 
-      if (res.ok) {
-        // Refresh data
-        await refetchData();
-      } else {
-        const data = await res.json();
-        alert(data.error || "Failed to promote user");
-      }
-    } catch (error) {
-      console.error("Error promoting user:", error);
-      alert("Error promoting user");
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
-  const demoteUser = async (userId: string) => {
-    setActionLoading(true);
-    try {
-      const res = await fetch("/api/owner/promote", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, role: "user" }),
-        credentials: "include",
-      });
-
-      if (res.ok) {
-        // Refresh data
-        await refetchData();
-      } else {
-        const data = await res.json();
-        alert(data.error || "Failed to demote user");
-      }
-    } catch (error) {
-      console.error("Error demoting user:", error);
-      alert("Error demoting user");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  
+  
 
   if (loading) {
     return (
@@ -223,9 +178,6 @@ const OwnerDashboard = () => {
           <CardContent>
             <UserManagementTable
               users={users}
-              onPromoteUser={promoteToAdmin}
-              onDemoteUser={demoteUser}
-              loading={actionLoading}
             />
           </CardContent>
         </Card>

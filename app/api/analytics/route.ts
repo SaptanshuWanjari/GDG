@@ -1,43 +1,19 @@
 import clientPromise from "@/app/db/mongo";
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
-
-interface JWTPayload {
-  userId: string;
-  email: string;
-  name: string;
-  isAdmin: boolean;
-  isOwner: boolean;
-  iat?: number;
-  exp?: number;
-}
+import { getServerAuth } from "@/lib/auth";
 
 export async function GET() {
   try {
-    // Check authentication and admin role
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
-
-    if (!token) {
+    // Verify authentication and roles via NextAuth
+    const auth = await getServerAuth();
+    if (!auth.isAuthenticated || !auth.user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      return NextResponse.json(
-        { error: "Server misconfiguration" },
-        { status: 500 }
-      );
-    }
-
-    const decoded = jwt.verify(token, secret) as JWTPayload;
-
-    // Check if user is admin or owner
-    if (!decoded.isAdmin && !decoded.isOwner) {
+    if (!auth.user.isAdmin && !auth.user.isOwner) {
       return NextResponse.json(
         { error: "Admin access required" },
         { status: 403 }

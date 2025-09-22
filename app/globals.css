@@ -200,6 +200,35 @@
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
   }
+
+  /* Remove default body margins that can show background gaps */
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background-color: var(--background);
+  }
+
+  /* Reserve scrollbar gutter to avoid layout shift when overlays open/close */
+  html {
+    scrollbar-gutter: stable both-edges;
+  }
+
+  /* Ensure body width doesn't shift when modals or dropdowns toggle scrollbar */
+  body {
+    min-width: 320px;
+  }
+
+  /* Force vertical scrollbar to be present to avoid layout shifts when overlays open/close */
+  body {
+    overflow-y: scroll;
+  }
+
+  /* Prevent horizontal page overflow caused by oversized navbar or overlays */
+  html,
+  body {
+    overflow-x: hidden;
+  }
 }
 
 /* Custom Animations */

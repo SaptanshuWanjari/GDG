@@ -203,19 +203,7 @@ const OwnerNavbar = () => {
               </DialogContent>
             </Dialog>
 
-            <Button
-              variant={isActive("/login") ? "default" : "ghost"}
-              size="sm"
-              asChild
-              className={
-                isActive("/login") ? "bg-primary text-primary-foreground" : ""
-              }
-            >
-              <Link href="/login" className="flex items-center gap-2">
-                <LogIn className="h-4 w-4" />
-                Login
-              </Link>
-            </Button>
+            
           </div>
         </div>
       </div>

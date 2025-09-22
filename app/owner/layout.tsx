@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import OwnerNavbar from "../components/OwnerNavbar";
+import OwnerNavbar from "@/app/components/navigation/OwnerNavbar";
 
 const OwnerLayout = ({ children }: { children: React.ReactNode }) => {
   return (

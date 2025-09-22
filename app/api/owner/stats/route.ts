@@ -17,10 +17,10 @@ export async function GET() {
     ]);
 
     const stats = {
-      totalUsers: users.length + admins.length + owners.length, // Total across all collections
+      totalUsers: users.length + admins.length + owners.length,
       totalAdmins: admins.length,
       totalBooks: books.length,
-      totalBorrows: 0, // Placeholder for future borrow tracking
+      totalBorrows: 0, 
     };
 
     return NextResponse.json({ success: true, stats });

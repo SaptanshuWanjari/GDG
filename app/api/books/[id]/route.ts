@@ -1,18 +1,7 @@
 import clientPromise from "@/app/db/mongo";
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+import { getServerAuth } from "@/lib/auth";
 import { ObjectId } from "mongodb";
-
-interface JWTPayload {
-  userId: string;
-  email: string;
-  name: string;
-  isAdmin: boolean;
-  isOwner: boolean;
-  iat?: number;
-  exp?: number;
-}
 
 // PUT - Update a book (Admin only)
 export async function PUT(
@@ -24,40 +13,16 @@ export async function PUT(
     const { id } = await params;
     console.log("Book ID to edit:", id);
 
-    // Check authentication and admin role
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
-
-    console.log("Token found:", !!token);
-    if (!token) {
-      console.log("No auth token found in cookies");
+    // Check authentication via NextAuth
+    const auth = await getServerAuth();
+    if (!auth.isAuthenticated || !auth.user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      console.log("JWT_SECRET not configured");
-      return NextResponse.json(
-        { error: "Server misconfiguration" },
-        { status: 500 }
-      );
-    }
-
-    const decoded = jwt.verify(token, secret) as JWTPayload;
-    console.log("JWT payload decoded:", {
-      userId: decoded.userId,
-      email: decoded.email,
-      name: decoded.name,
-      isAdmin: decoded.isAdmin,
-      isOwner: decoded.isOwner,
-    });
-
-    // Check if user is admin or owner
-    if (!decoded.isAdmin && !decoded.isOwner) {
-      console.log("Access denied - not admin or owner");
+    if (!auth.user.isAdmin && !auth.user.isOwner) {
       return NextResponse.json(
         { error: "Admin access required" },
         { status: 403 }
@@ -120,29 +85,16 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // Check authentication and admin role
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
-
-    if (!token) {
+    // Check authentication via NextAuth
+    const auth = await getServerAuth();
+    if (!auth.isAuthenticated || !auth.user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      return NextResponse.json(
-        { error: "Server misconfiguration" },
-        { status: 500 }
-      );
-    }
-
-    const decoded = jwt.verify(token, secret) as JWTPayload;
-
-    // Check if user is admin or owner
-    if (!decoded.isAdmin && !decoded.isOwner) {
+    if (!auth.user.isAdmin && !auth.user.isOwner) {
       return NextResponse.json(
         { error: "Admin access required" },
         { status: 403 }

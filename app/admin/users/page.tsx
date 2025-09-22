@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Shield, Crown } from "lucide-react";
+import { Users, Shield, Crown } from "lucide-react";
 import { toast } from "sonner";
-import AdminUserManagementTable from "@/app/components/admin/AdminUserManagementTable";
+import DataTable from "@/app/components/common/DataTable";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
 
 interface User {
   _id: string;
@@ -58,20 +60,22 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
           <p className="text-gray-600">Manage users and their permissions.</p>
         </div>
-        <Button>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add User
-        </Button>
+        <div className="w-full sm:w-auto">
+          <Button onClick={fetchUsers} className="w-full sm:w-auto">
+            <Activity className="h-4 w-4 mr-2" />
+            Refresh Data
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -120,12 +124,77 @@ const UsersPage = () => {
           <CardTitle>All Users</CardTitle>
         </CardHeader>
         <CardContent>
-          <AdminUserManagementTable
-            users={users}
-            onEditUser={handleEditUser}
-            onDeleteUser={handleDeleteUser}
-            loading={loading}
-          />
+          {loading && (
+            <div className="mb-4 text-sm text-muted-foreground">
+              Loading users...
+            </div>
+          )}
+          <div className="overflow-x-auto">
+            <DataTable
+              columns={(() => {
+                const cols: ColumnDef<User, unknown>[] = [
+                  {
+                    accessorKey: "name",
+                    header: "Name",
+                    cell: (info) => (
+                      <div className="font-medium">
+                        {info.getValue<string>()}
+                      </div>
+                    ),
+                  },
+                  {
+                    accessorKey: "email",
+                    header: "Email",
+                    cell: (info) => (
+                      <div className="text-sm text-muted-foreground">
+                        {info.getValue<string>()}
+                      </div>
+                    ),
+                  },
+                  {
+                    accessorKey: "role",
+                    header: "Role",
+                    cell: (info) => (
+                      <div className="text-sm">{info.getValue<string>()}</div>
+                    ),
+                  },
+                  {
+                    accessorKey: "createdAt",
+                    header: "Created",
+                    cell: (info) => (
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(info.getValue<string>()).toLocaleString()}
+                      </div>
+                    ),
+                  },
+                  {
+                    id: "actions",
+                    header: "Actions",
+                    cell: (info) => (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleEditUser(info.row.original._id)}
+                          className="text-sm px-2 py-1 bg-primary text-primary-foreground rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleDeleteUser(info.row.original._id)
+                          }
+                          className="text-sm px-2 py-1 border rounded border-border/40 text-muted-foreground"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ),
+                  } as ColumnDef<User, unknown>,
+                ];
+                return cols;
+              })()}
+              data={users}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
