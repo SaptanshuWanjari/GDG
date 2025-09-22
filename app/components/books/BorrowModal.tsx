@@ -110,6 +110,34 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({ book, trigger }) => {
       return;
     }
 
+    // If opening, check availability first
+    if (open) {
+      (async () => {
+        try {
+          if (!book._id) {
+            setIsOpen(true);
+            return;
+          }
+          const res = await fetch(`/api/books/borrow?bookId=${encodeURIComponent(String(book._id))}`);
+          if (res.ok) {
+            const info = await res.json();
+            if (info.borrowed) {
+              // If borrowed by current user, allow borrowing prevention message
+              const isMine = session?.user?.email && session.user.email.toLowerCase() === (info.by?.userEmail || '').toLowerCase();
+              if (!isMine) {
+                toast.error(`This book is currently borrowed by ${info.by?.userName || info.by?.userEmail}. Due: ${info.by?.dueDate ? new Date(info.by.dueDate).toLocaleDateString() : 'unknown'}`);
+                return; // do not open
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error checking book availability', err);
+        }
+        setIsOpen(true);
+      })();
+      return;
+    }
+
     setIsOpen(open);
   };
 

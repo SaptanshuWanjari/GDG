@@ -246,8 +246,8 @@ const AnalyticsPage = () => {
         </Card>
       </div>
 
-  {/* Top Categories and Recent Activity */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Top Categories and Recent Activity */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Top Categories */}
         <Card>
           <CardHeader>
@@ -309,7 +309,9 @@ const AnalyticsPage = () => {
                     >
                       <div className="flex-1 min-w-0">
                         <div className="font-medium truncate">{book.title}</div>
-                        <div className="text-gray-500 truncate">by {book.author}</div>
+                        <div className="text-gray-500 truncate">
+                          by {book.author}
+                        </div>
                       </div>
                       <div className="sm:ml-4 flex-shrink-0">
                         <Badge variant="outline">{book.category}</Badge>

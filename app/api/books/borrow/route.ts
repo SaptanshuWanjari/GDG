@@ -68,6 +68,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check if the book is already borrowed (status 'borrowed' or 'overdue')
+    try {
+      const existingBorrow = await db.collection("borrowed_books").findOne({
+        bookId: bookId,
+        status: { $in: ["borrowed", "overdue"] },
+      });
+
+      if (existingBorrow) {
+        const existingEmail = (existingBorrow.userEmail || "").toLowerCase();
+        const requesterEmail = (finalUserEmail || "").toLowerCase();
+
+        if (existingEmail !== requesterEmail) {
+          return NextResponse.json(
+            { error: "Book is currently borrowed by another member" },
+            { status: 409 }
+          );
+        }
+
+        // If the same user already has an active borrow entry, prevent duplicate borrow
+        return NextResponse.json(
+          { error: "You already have this book borrowed" },
+          { status: 409 }
+        );
+      }
+    } catch (err) {
+      console.error("Error checking existing borrow status:", err);
+      // continue to other logic or return error
+      return NextResponse.json({ error: "Server error" }, { status: 500 });
+    }
+
     // Check if the book exists (try ObjectId if appropriate)
     let book;
     try {
@@ -151,9 +181,34 @@ export async function POST(req: NextRequest) {
 }
 
 // GET endpoint to fetch borrowed books (for admin dashboard)
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { db } = await connectMongoDB();
+
+    // If a specific bookId is requested, return availability info for that book
+    const url = new URL(req.url);
+    const bookIdQuery = url.searchParams.get("bookId");
+    if (bookIdQuery) {
+      const existing = await db.collection("borrowed_books").findOne({
+        bookId: bookIdQuery,
+        status: { $in: ["borrowed", "overdue"] },
+      });
+      if (existing) {
+        return NextResponse.json(
+          {
+            borrowed: true,
+            by: {
+              userName: existing.userName,
+              userEmail: existing.userEmail,
+              dueDate: existing.dueDate,
+              status: existing.status,
+            },
+          },
+          { status: 200 }
+        );
+      }
+      return NextResponse.json({ borrowed: false }, { status: 200 });
+    }
 
     // Fetch all borrowed books with sorting by borrow date (newest first)
     const borrowedBooks = await db

@@ -150,28 +150,56 @@ export const authOptions: AuthOptions = {
       try {
         if (account?.provider === "google") {
           const client = await clientPromise;
-          const db = client.db("LibraryManagement");
+          const db = client.db(process.env.MONGODB_DB || "LibraryManagement");
 
-          const email = user.email as string;
+          // Robust email extraction from user/profile
+          const profileAny = profile as unknown as Record<string, unknown>;
+          const getFirstEmail = (p: Record<string, unknown> | undefined) => {
+            if (!p) return null;
+            const e = p.email;
+            if (typeof e === "string" && e.length > 0) return e;
+            const emails = p.emails;
+            if (Array.isArray(emails) && emails.length > 0) {
+              const first = emails[0];
+              if (typeof first === "string") return first;
+              if (first && typeof first === "object" && "value" in (first as Record<string, unknown>)) {
+                const val = (first as Record<string, unknown>).value;
+                if (typeof val === "string") return val;
+              }
+            }
+            return null;
+          };
+
+          const email = (user && (user.email as string)) || getFirstEmail(profileAny) || null;
+
+          console.log("[nextauth] signIn callback - provider:", account.provider, "email:", email);
+
+          if (!email) {
+            console.warn("[nextauth] signIn: no email found in Google profile, skipping user upsert", { profile });
+            return true;
+          }
+
           const existing = await db.collection("users").findOne({ email });
           if (!existing) {
-            await db.collection("users").insertOne({
-              name: user.name || profile?.name || "",
+            const insertRes = await db.collection("users").insertOne({
+              name: (user && user.name) || profileAny?.name || "",
               email,
-              image: user.image || ((profile as unknown as { picture?: string })?.picture ?? null),
+              image: (user && user.image) || profileAny?.picture || null,
               createdAt: new Date(),
             });
+            console.log("[nextauth] signIn: inserted new user with id", insertRes.insertedId?.toString());
           } else {
             // update existing profile fields if missing
-            await db.collection("users").updateOne(
+            const updateRes = await db.collection("users").updateOne(
               { email },
               {
                 $set: {
-                  name: user.name || existing.name,
-                  image: user.image || existing.image,
+                  name: (user && user.name) || existing.name,
+                  image: (user && user.image) || existing.image,
                 },
               }
             );
+            console.log("[nextauth] signIn: updated existing user", { matchedCount: updateRes.matchedCount, modifiedCount: updateRes.modifiedCount });
           }
         }
       } catch (err) {
