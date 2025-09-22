@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import {
   Form,
@@ -69,6 +70,7 @@ const Page = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const router = useRouter();
 
   // Update form values when userData changes
   useEffect(() => {
@@ -147,7 +149,26 @@ const Page = () => {
                 <BiPencil size={20} />
                 <span className="ml-2">Edit</span>
               </Button>
-              <Button className="bg-red-600 text-white hover:bg-red-700 cursor-pointer w-full sm:w-auto">
+              <Button
+                className="bg-red-600 text-white hover:bg-red-700 cursor-pointer w-full sm:w-auto"
+                onClick={async () => {
+                  if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
+                  try {
+                    const res = await fetch("/api/users", { method: "DELETE" });
+                    const body = await res.json();
+                    if (!res.ok) {
+                      toast.error(body.error || "Failed to delete account");
+                      return;
+                    }
+                    toast.success("Account deleted. Signing out...");
+                    await signOut({ redirect: false });
+                    router.push("/");
+                  } catch (err) {
+                    console.error("Delete account error:", err);
+                    toast.error("An error occurred while deleting your account");
+                  }
+                }}
+              >
                 Delete
               </Button>
             </CardAction>
@@ -273,6 +294,7 @@ const Page = () => {
                 </Button>
               </>
             )}
+            
           </CardFooter>
         </Card>
       </div>
