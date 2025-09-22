@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BiBookBookmark } from "react-icons/bi";
-import { Home, LogIn, Shield, Settings } from "lucide-react";
+import { Home, Shield, Settings } from "lucide-react";
 import {
   Dialog,
   DialogContent,

@@ -16,7 +16,6 @@ export default function AuthLayout({
 }: AuthLayoutProps) {
   const pathname = usePathname();
   const isLogin = pathname.includes("/login");
-  const isRegister = pathname.includes("/register");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 overflow-hidden">

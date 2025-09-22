@@ -32,7 +32,7 @@ export default function Home() {
   const [featuredBooks, setFeaturedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [stats, setStats] = useState<{
     totalBooks: number;
     totalUsers: number;

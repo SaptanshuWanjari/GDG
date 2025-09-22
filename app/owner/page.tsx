@@ -29,7 +29,6 @@ const OwnerDashboard = () => {
     totalBorrows: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,34 +65,7 @@ const OwnerDashboard = () => {
     fetchData();
   }, []);
 
-  const refetchData = async () => {
-    try {
-      // Fetch users and stats
-      const [usersRes, statsRes] = await Promise.all([
-        fetch("/api/owner/users", { credentials: "include" }),
-        fetch("/api/owner/stats", { credentials: "include" }),
-      ]);
-
-      if (usersRes.ok) {
-        const usersData = await usersRes.json();
-        setUsers(usersData.users || []);
-      }
-
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStats(
-          statsData.stats || {
-            totalUsers: 0,
-            totalAdmins: 0,
-            totalBooks: 0,
-            totalBorrows: 0,
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching owner data:", error);
-    }
-  };
+  
 
 
 

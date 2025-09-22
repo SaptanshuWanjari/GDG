@@ -5,7 +5,7 @@ import { getServerAuth } from "@/lib/auth";
 const uri = process.env.MONGODB_URI!;
 const client = new MongoClient(uri);
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Verify owner authentication via NextAuth
     const auth = await getServerAuth();
