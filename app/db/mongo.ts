@@ -28,7 +28,8 @@ if (process.env.NODE_ENV === "development") {
 // Helper function to get connected database
 export async function connectMongoDB() {
   const client = await clientPromise;
-  const db = client.db("LibraryManagement");
+  const dbName = process.env.MONGODB_DB || "LibraryManagement";
+  const db = client.db(dbName);
   return { client, db };
 }
 

@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { name, email, password } = body;
-
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: "All fields are required" },
@@ -32,7 +31,8 @@ export async function POST(request: NextRequest) {
     }
 
     const client = await clientPromise;
-    const db = client.db("libraryMS");
+    const dbName = process.env.MONGODB_DB || "LibraryManagement";
+    const db = client.db(dbName);
 
     // Check if admin already exists
     const existingAdmin = await db.collection("admins").findOne({ email });

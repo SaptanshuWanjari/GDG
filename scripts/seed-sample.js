@@ -14,50 +14,51 @@ async function run() {
   const client = new MongoClient(uri);
   try {
     await client.connect();
-    const db = client.db("LibraryManagement");
+    const dbName = process.env.MONGODB_DB || "LibraryManagement";
+    const db = client.db(dbName);
 
     const sampleBooks = [
-    //   {
-    //     title: "The Pragmatic Programmer",
-    //     author: "Andrew Hunt & David Thomas",
-    //     category: "Programming",
-    //     publishedYear: 1999,
-    //     isbn: "978-0201616224",
-    //     summary: "A pragmatic approach to software development.",
-    //   },
-    //   {
-    //     title: "Clean Code",
-    //     author: "Robert C. Martin",
-    //     category: "Programming",
-    //     publishedYear: 2008,
-    //     isbn: "978-0132350884",
-    //     summary: "A handbook of agile software craftsmanship.",
-    //   },
-    //   {
-    //     title: "Eloquent JavaScript",
-    //     author: "Marijn Haverbeke",
-    //     category: "Programming",
-    //     publishedYear: 2018,
-    //     isbn: "978-1593279509",
-    //     summary: "A modern introduction to programming.",
-    //   },
-    //   {
-    //     title: "The Hobbit",
-    //     author: "J.R.R. Tolkien",
-    //     category: "Fantasy",
-    //     publishedYear: 1937,
-    //     isbn: "978-0547928227",
-    //     summary: "A fantasy novel and prelude to The Lord of the Rings.",
-    //   },
-    //   {
-    //     title: "1984",
-    //     author: "George Orwell",
-    //     category: "Dystopian",
-    //     publishedYear: 1949,
-    //     isbn: "978-0451524935",
-    //     summary:
-    //       "A dystopian social science fiction novel and cautionary tale.",
-    //   },
+      //   {
+      //     title: "The Pragmatic Programmer",
+      //     author: "Andrew Hunt & David Thomas",
+      //     category: "Programming",
+      //     publishedYear: 1999,
+      //     isbn: "978-0201616224",
+      //     summary: "A pragmatic approach to software development.",
+      //   },
+      //   {
+      //     title: "Clean Code",
+      //     author: "Robert C. Martin",
+      //     category: "Programming",
+      //     publishedYear: 2008,
+      //     isbn: "978-0132350884",
+      //     summary: "A handbook of agile software craftsmanship.",
+      //   },
+      //   {
+      //     title: "Eloquent JavaScript",
+      //     author: "Marijn Haverbeke",
+      //     category: "Programming",
+      //     publishedYear: 2018,
+      //     isbn: "978-1593279509",
+      //     summary: "A modern introduction to programming.",
+      //   },
+      //   {
+      //     title: "The Hobbit",
+      //     author: "J.R.R. Tolkien",
+      //     category: "Fantasy",
+      //     publishedYear: 1937,
+      //     isbn: "978-0547928227",
+      //     summary: "A fantasy novel and prelude to The Lord of the Rings.",
+      //   },
+      //   {
+      //     title: "1984",
+      //     author: "George Orwell",
+      //     category: "Dystopian",
+      //     publishedYear: 1949,
+      //     isbn: "978-0451524935",
+      //     summary:
+      //       "A dystopian social science fiction novel and cautionary tale.",
+      //   },
       {
         title: "To Kill a Mockingbird",
         author: "Harper Lee",
@@ -73,7 +74,7 @@ async function run() {
         category: "Classic",
         publishedYear: 1925,
         isbn: "978-0743273565",
-        summary: "A novel about the American dream and societal excess.",   
+        summary: "A novel about the American dream and societal excess.",
       },
       {
         title: "The Catcher in the Rye",
@@ -91,7 +92,7 @@ async function run() {
         publishedYear: 1954,
         isbn: "978-0618640157",
         summary: "An epic high-fantasy novel set in Middle-earth.",
-      }
+      },
     ];
 
     // Skip if first sample already exists

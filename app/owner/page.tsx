@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import ProtectedLayout from "@/app/components/layout/ProtectedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, BookOpen, Shield, TrendingUp } from "lucide-react";
-import UserManagementTable from "@/app/components/admin/UserManagementTable";
+import DataTable from "@/app/components/common/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
 
 interface User {
   _id: string;
@@ -64,13 +65,6 @@ const OwnerDashboard = () => {
 
     fetchData();
   }, []);
-
-  
-
-
-
-  
-  
 
   if (loading) {
     return (
@@ -148,8 +142,37 @@ const OwnerDashboard = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <UserManagementTable
-              users={users}
+            {/* DataTable: simple, reusable table for owner user management */}
+            {
+              // Build columns inline for the generic DataTable
+            }
+            <DataTable
+              columns={
+                [
+                  {
+                    accessorKey: "name",
+                    header: "Name",
+                    cell: (info) => info.getValue() || "No name provided",
+                  },
+                  {
+                    accessorKey: "email",
+                    header: "Email",
+                    cell: (info) => info.getValue(),
+                  },
+                  {
+                    accessorKey: "role",
+                    header: "Role",
+                    cell: (info) => String(info.getValue()).toUpperCase(),
+                  },
+                  {
+                    accessorKey: "createdAt",
+                    header: "Joined",
+                    cell: (info) =>
+                      new Date(String(info.getValue())).toLocaleDateString(),
+                  },
+                ] as ColumnDef<User, unknown>[]
+              }
+              data={users}
             />
           </CardContent>
         </Card>

@@ -166,7 +166,8 @@ export async function DELETE() {
     const db = client.db(dbName);
 
     // Determine which collection to delete from based on role
-    const collectionName = auth.user.isAdmin || auth.user.isOwner ? "admins" : "users";
+    const collectionName =
+      auth.user.isAdmin || auth.user.isOwner ? "admins" : "users";
     const collection = db.collection(collectionName);
 
     const result = await collection.deleteOne({ email: auth.user.email });

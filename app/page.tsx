@@ -36,15 +36,14 @@ export default function Home() {
   const [stats, setStats] = useState<{
     totalBooks: number;
     totalUsers: number;
-    avgRating?: number;
   } | null>(null);
 
   useEffect(() => {
     setIsLoggedIn(status === "authenticated");
   }, [status]);
 
+  // Fetch public stats (books, users) for homepage
   useEffect(() => {
-    // Fetch public stats (books, users) for homepage
     const fetchStats = async () => {
       try {
         const res = await fetch("/api/owner/stats");
@@ -64,8 +63,8 @@ export default function Home() {
     fetchStats();
   }, []);
 
+  // Fetch some sample books for the public view
   useEffect(() => {
-    // Fetch some sample books for the public view
     const fetchFeaturedBooks = async () => {
       try {
         const res = await fetch("/api/books");
@@ -353,8 +352,10 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center text-primary-foreground">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-center text-primary-foreground">
             <div className="group animate-fade-in-up">
+
+              {/* Books Stats */}
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-foreground/20 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
                 <BookOpen className="h-10 w-10 text-primary-foreground group-hover:text-primary-foreground/80 transition-colors duration-300" />
               </div>
@@ -365,6 +366,8 @@ export default function Home() {
                 Books Available
               </p>
             </div>
+
+            {/* Users Stats */}
             <div className="group animate-fade-in-up animation-delay-200">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-foreground/20 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Users className="h-10 w-10 text-primary-foreground group-hover:text-primary-foreground/80 transition-colors duration-300" />
@@ -374,19 +377,6 @@ export default function Home() {
               </h3>
               <p className="text-primary-foreground/90 text-lg font-medium">
                 Active Members
-              </p>
-            </div>
-            <div className="group animate-fade-in-up animation-delay-400">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-foreground/20 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Star className="h-10 w-10 text-primary-foreground group-hover:text-primary-foreground/80 transition-colors duration-300" />
-              </div>
-              <h3 className="text-4xl md:text-5xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300">
-                {stats && stats.avgRating
-                  ? stats.avgRating.toFixed(1) + "/5"
-                  : "4.9/5"}
-              </h3>
-              <p className="text-primary-foreground/90 text-lg font-medium">
-                User Rating
               </p>
             </div>
           </div>

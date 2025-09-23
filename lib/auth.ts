@@ -23,11 +23,3 @@ export async function getServerAuth() {
     return { isAuthenticated: false, user: null };
   }
 }
-
-// Client-side auth check - use NextAuth useSession hook instead
-export function getClientAuth() {
-  console.warn(
-    "getClientAuth is deprecated - use useSession hook from next-auth/react instead"
-  );
-  return { isAuthenticated: false, user: null };
-}

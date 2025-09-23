@@ -152,7 +152,12 @@ const Page = () => {
               <Button
                 className="bg-red-600 text-white hover:bg-red-700 cursor-pointer w-full sm:w-auto"
                 onClick={async () => {
-                  if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
+                  if (
+                    !confirm(
+                      "Are you sure you want to delete your account? This cannot be undone."
+                    )
+                  )
+                    return;
                   try {
                     const res = await fetch("/api/users", { method: "DELETE" });
                     const body = await res.json();
@@ -165,7 +170,9 @@ const Page = () => {
                     router.push("/");
                   } catch (err) {
                     console.error("Delete account error:", err);
-                    toast.error("An error occurred while deleting your account");
+                    toast.error(
+                      "An error occurred while deleting your account"
+                    );
                   }
                 }}
               >
@@ -294,7 +301,6 @@ const Page = () => {
                 </Button>
               </>
             )}
-            
           </CardFooter>
         </Card>
       </div>

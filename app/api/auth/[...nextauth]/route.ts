@@ -23,87 +23,41 @@ export const authOptions: AuthOptions = {
 
         try {
           const client = await clientPromise;
-          const db = client.db("LibraryManagement");
+          const dbName = process.env.MONGODB_DB || "LibraryManagement";
+          const db = client.db(dbName);
 
           let user = null;
           let isAdmin = false;
           let isOwner = false;
 
-          //! hardcoded admin and owner accounts
-          // Check for special admin/owner accounts first
-          if (
-            credentials.email === "admin@admin.com" ||
-            credentials.email === "owner@library.com"
-          ) {
-            let admin = await db
-              .collection("admins")
-              .findOne({ email: credentials.email });
-
-            if (!admin) {
-              // Create admin/owner account if it doesn't exist
-              const hashedPassword = await bcrypt.hash(
-                credentials.email === "admin@admin.com"
-                  ? "admin123"
-                  : "owner123",
-                10
-              );
-
-              const newAdmin = {
-                email: credentials.email,
-                name:
-                  credentials.email === "admin@admin.com"
-                    ? "Admin User"
-                    : "Owner User",
-                password: hashedPassword,
-                isOwner: credentials.email === "owner@library.com",
-                createdAt: new Date(),
-              };
-
-              const result = await db.collection("admins").insertOne(newAdmin);
-              admin = { ...newAdmin, _id: result.insertedId };
-            }
-
-            // Verify password
+          // Check admins collection first
+          const admin = await db
+            .collection("admins")
+            .findOne({ email: credentials.email });
+          if (admin) {
             const passwordMatch = await bcrypt.compare(
-              credentials.email === "admin@admin.com" ? "admin123" : "owner123",
+              credentials.password,
               admin.password
             );
-
             if (passwordMatch) {
               user = admin;
               isAdmin = true;
               isOwner = admin.isOwner || false;
             }
           } else {
-            // Check admins collection first
-            const admin = await db
-              .collection("admins")
+            // Check regular users collection
+            const regularUser = await db
+              .collection("users")
               .findOne({ email: credentials.email });
-            if (admin) {
+            if (regularUser) {
               const passwordMatch = await bcrypt.compare(
                 credentials.password,
-                admin.password
+                regularUser.password
               );
               if (passwordMatch) {
-                user = admin;
-                isAdmin = true;
-                isOwner = admin.isOwner || false;
-              }
-            } else {
-              // Check regular users collection
-              const regularUser = await db
-                .collection("users")
-                .findOne({ email: credentials.email });
-              if (regularUser) {
-                const passwordMatch = await bcrypt.compare(
-                  credentials.password,
-                  regularUser.password
-                );
-                if (passwordMatch) {
-                  user = regularUser;
-                  isAdmin = false;
-                  isOwner = false;
-                }
+                user = regularUser;
+                isAdmin = false;
+                isOwner = false;
               }
             }
           }
@@ -162,7 +116,11 @@ export const authOptions: AuthOptions = {
             if (Array.isArray(emails) && emails.length > 0) {
               const first = emails[0];
               if (typeof first === "string") return first;
-              if (first && typeof first === "object" && "value" in (first as Record<string, unknown>)) {
+              if (
+                first &&
+                typeof first === "object" &&
+                "value" in (first as Record<string, unknown>)
+              ) {
                 const val = (first as Record<string, unknown>).value;
                 if (typeof val === "string") return val;
               }
@@ -170,12 +128,23 @@ export const authOptions: AuthOptions = {
             return null;
           };
 
-          const email = (user && (user.email as string)) || getFirstEmail(profileAny) || null;
+          const email =
+            (user && (user.email as string)) ||
+            getFirstEmail(profileAny) ||
+            null;
 
-          console.log("[nextauth] signIn callback - provider:", account.provider, "email:", email);
+          console.log(
+            "[nextauth] signIn callback - provider:",
+            account.provider,
+            "email:",
+            email
+          );
 
           if (!email) {
-            console.warn("[nextauth] signIn: no email found in Google profile, skipping user upsert", { profile });
+            console.warn(
+              "[nextauth] signIn: no email found in Google profile, skipping user upsert",
+              { profile }
+            );
             return true;
           }
 
@@ -187,7 +156,10 @@ export const authOptions: AuthOptions = {
               image: (user && user.image) || profileAny?.picture || null,
               createdAt: new Date(),
             });
-            console.log("[nextauth] signIn: inserted new user with id", insertRes.insertedId?.toString());
+            console.log(
+              "[nextauth] signIn: inserted new user with id",
+              insertRes.insertedId?.toString()
+            );
           } else {
             // update existing profile fields if missing
             const updateRes = await db.collection("users").updateOne(
@@ -199,7 +171,10 @@ export const authOptions: AuthOptions = {
                 },
               }
             );
-            console.log("[nextauth] signIn: updated existing user", { matchedCount: updateRes.matchedCount, modifiedCount: updateRes.modifiedCount });
+            console.log("[nextauth] signIn: updated existing user", {
+              matchedCount: updateRes.matchedCount,
+              modifiedCount: updateRes.modifiedCount,
+            });
           }
         }
       } catch (err) {
