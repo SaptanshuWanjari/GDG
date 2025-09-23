@@ -7,7 +7,8 @@ const client = new MongoClient(uri);
 export async function GET() {
   try {
     await client.connect();
-    const db = client.db("LibraryManagement");
+    const dbName = process.env.MONGODB_DB || "LibraryManagement";
+    const db = client.db(dbName);
 
     const [users, admins, owners, books] = await Promise.all([
       db.collection("users").find({}).toArray(),
@@ -20,7 +21,7 @@ export async function GET() {
       totalUsers: users.length + admins.length + owners.length,
       totalAdmins: admins.length,
       totalBooks: books.length,
-      totalBorrows: 0, 
+      totalBorrows: 0,
     };
 
     return NextResponse.json({ success: true, stats });

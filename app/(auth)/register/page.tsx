@@ -209,6 +209,7 @@ const Page = () => {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
+                  {/* Full Name */}
                   <FormField
                     control={form.control}
                     name="fullname"
@@ -229,6 +230,7 @@ const Page = () => {
                     )}
                   />
 
+                  {/* email */}
                   <FormField
                     control={form.control}
                     name="email"
@@ -249,6 +251,7 @@ const Page = () => {
                     )}
                   />
 
+                  {/* Password */}
                   <FormField
                     control={form.control}
                     name="password"
@@ -283,6 +286,7 @@ const Page = () => {
                     )}
                   />
 
+                  {/* Confirm Password */}
                   <FormField
                     control={form.control}
                     name="confirmPassword"
@@ -303,7 +307,8 @@ const Page = () => {
                       </FormItem>
                     )}
                   />
-
+                  
+                  {/* Submit Button */}
                   <Button
                     type="submit"
                     className="w-full h-12 text-base font-semibold"

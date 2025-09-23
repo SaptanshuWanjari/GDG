@@ -202,8 +202,6 @@ const OwnerNavbar = () => {
                 </form>
               </DialogContent>
             </Dialog>
-
-            
           </div>
         </div>
       </div>

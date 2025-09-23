@@ -19,10 +19,12 @@ export default function AlertComponent({
       <AlertDialogContent>
         <AlertDialogHeader>
           {/* Accessible title for screen readers (visually hidden) */}
-          <AlertDialogTitle className="sr-only">Logging in</AlertDialogTitle>
+          <AlertDialogTitle className="sr-only text-xl">
+            Logging in
+          </AlertDialogTitle>
           <div className="flex items-center gap-3">
             <LoadingSpinner className="h-8 w-8 text-blue-500" />
-            <AlertDialogDescription className="text-muted-foreground text-sm">
+            <AlertDialogDescription className="text-muted-foreground text-lg">
               Logging in...
             </AlertDialogDescription>
           </div>

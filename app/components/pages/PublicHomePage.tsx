@@ -130,7 +130,7 @@ const PublicHomePage = () => {
                 asChild
                 className="bg-background text-foreground hover:bg-secondary hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-primary-foreground/25 px-8 py-4 text-lg font-semibold"
               >
-                <Link href="/auth/register" className="flex items-center gap-3">
+                <Link href="/register" className="flex items-center gap-3">
                   <UserPlus className="h-6 w-6" />
                   Get Started Free
                 </Link>
@@ -141,7 +141,7 @@ const PublicHomePage = () => {
                 asChild
                 className="border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground hover:text-primary hover:scale-105 transition-all duration-300 backdrop-blur-sm px-8 py-4 text-lg font-semibold"
               >
-                <Link href="/auth/login" className="flex items-center gap-3">
+                <Link href="/login" className="flex items-center gap-3">
                   <LogIn className="h-6 w-6" />
                   Sign In
                 </Link>
@@ -349,7 +349,7 @@ const PublicHomePage = () => {
               asChild
               className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-2xl hover:shadow-primary/25 hover:scale-105 transition-all duration-300 px-10 py-5 text-lg font-semibold"
             >
-              <Link href="/auth/register" className="flex items-center gap-3">
+              <Link href="/register" className="flex items-center gap-3">
                 <UserPlus className="h-6 w-6" />
                 Create Free Account
               </Link>
@@ -360,7 +360,7 @@ const PublicHomePage = () => {
               asChild
               className="border-2 border-primary/30 text-foreground hover:bg-primary/10 hover:border-primary hover:scale-105 transition-all duration-300 backdrop-blur-sm px-10 py-5 text-lg font-semibold"
             >
-              <Link href="/auth/login" className="flex items-center gap-3">
+              <Link href="/login" className="flex items-center gap-3">
                 <LogIn className="h-6 w-6" />
                 Already have an account?
               </Link>
@@ -388,7 +388,7 @@ const PublicHomePage = () => {
               <ul className="space-y-2 text-muted-foreground">
                 <li>
                   <Link
-                    href="/auth/register"
+                    href="/register"
                     className="hover:text-secondary-foreground transition-colors"
                   >
                     Sign Up
@@ -396,7 +396,7 @@ const PublicHomePage = () => {
                 </li>
                 <li>
                   <Link
-                    href="/auth/login"
+                    href="/login"
                     className="hover:text-secondary-foreground transition-colors"
                   >
                     Sign In

@@ -204,9 +204,13 @@
   /* Remove default body margins that can show background gaps */
   body,
   html {
+    /* Override universal border applied above ("* { @apply border-border }")
+       so the root elements don't render thin gray lines at the page edges. */
+    @apply border-0;
     margin: 0;
-    padding: 0;
+    height: 100%;
     width: 100%;
+    padding: 0;
     background-color: var(--background);
   }
 

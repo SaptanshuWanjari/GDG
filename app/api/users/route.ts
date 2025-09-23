@@ -149,3 +149,36 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+export async function DELETE() {
+  try {
+    // Check authentication via NextAuth
+    const auth = await getServerAuth();
+    if (!auth.isAuthenticated || !auth.user) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    const client = await clientPromise;
+    const dbName = process.env.MONGODB_DB || "LibraryManagement";
+    const db = client.db(dbName);
+
+    // Determine which collection to delete from based on role
+    const collectionName =
+      auth.user.isAdmin || auth.user.isOwner ? "admins" : "users";
+    const collection = db.collection(collectionName);
+
+    const result = await collection.deleteOne({ email: auth.user.email });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: "Account deleted" });
+  } catch (err) {
+    console.error("Delete user API error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}

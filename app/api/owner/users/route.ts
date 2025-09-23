@@ -24,7 +24,8 @@ export async function GET() {
     }
 
     await client.connect();
-    const db = client.db("LibraryManagement");
+    const dbName = process.env.MONGODB_DB || "LibraryManagement";
+    const db = client.db(dbName);
 
     // Fetch all users from all collections
     const [users, admins, owners] = await Promise.all([
@@ -84,7 +85,8 @@ export async function POST(request: NextRequest) {
     }
 
     await client.connect();
-    const db = client.db("LibraryManagement");
+    const dbName = process.env.MONGODB_DB || "LibraryManagement";
+    const db = client.db(dbName);
 
     // Find the user in all collections
     let currentUser = null;

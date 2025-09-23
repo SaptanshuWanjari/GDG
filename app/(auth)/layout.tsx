@@ -15,11 +15,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  const isLoggedIn = status === "authenticated";
 
   return (
     <div>
-      {!isLoggedIn && <AuthNavbar />}
+      {/* {!isLoggedIn && <AuthNavbar />} */}
+      <AuthNavbar />
       {children}
     </div>
   );
