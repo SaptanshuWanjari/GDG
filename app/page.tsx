@@ -162,9 +162,20 @@ export default function Home() {
               )}
             </h1>
             <p className="text-xl md:text-2xl mb-10 text-primary-foreground/90 max-w-4xl mx-auto leading-relaxed font-light animate-fade-in-up animation-delay-400">
-              {isLoggedIn
-                ? "Continue your reading journey and discover new books in our comprehensive digital library. Your next great read awaits!"
-                : "Discover, explore, and manage your reading journey with our comprehensive digital library management system. Join thousands of readers in their literary adventures."}
+              {isLoggedIn ? (
+                <>
+                  Continue your reading journey on LibraryMS — discover new
+                  books in our comprehensive digital library. Your next great
+                  read awaits!
+                </>
+              ) : (
+                <>
+                  Start exploring LibraryMS to discover, explore, and manage
+                  your reading journey with our comprehensive digital library
+                  management system. Join thousands of readers in their literary
+                  adventures.
+                </>
+              )}
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center animate-fade-in-up animation-delay-600">
               {!isLoggedIn ? (
@@ -354,7 +365,6 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-center text-primary-foreground">
             <div className="group animate-fade-in-up">
-
               {/* Books Stats */}
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-foreground/20 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
                 <BookOpen className="h-10 w-10 text-primary-foreground group-hover:text-primary-foreground/80 transition-colors duration-300" />
@@ -443,7 +453,7 @@ export default function Home() {
                     href="/register"
                     className="hover:underline transition-colors "
                   >
-                    Sign Up
+                    Create a free account
                   </Link>
                 </li>
                 <li>
@@ -451,7 +461,7 @@ export default function Home() {
                     href="/login"
                     className="hover:underline transition-colors"
                   >
-                    Sign In
+                    Sign in to your account
                   </Link>
                 </li>
                 <li>
