@@ -142,22 +142,12 @@ export async function POST(req: NextRequest) {
 
     // Update the book's borrow count
     try {
-      // try ObjectId update first
-      try {
-        await db
-          .collection("books")
-          .updateOne(
-            { _id: new ObjectId(bookId) },
-            { $inc: { borrowCount: 1 }, $set: { updatedAt: new Date() } }
-          );
-      } catch {
         await db
           .collection("books")
           .updateOne(
             { _id: bookId },
             { $inc: { borrowCount: 1 }, $set: { updatedAt: new Date() } }
           );
-      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error("Error updating book borrow count:", msg);

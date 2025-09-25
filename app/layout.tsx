@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConditionalNav from "./components/navigation/NavController";
-import { Toaster } from "@/components/ui/sonner";
-import AuthProvider from "./components/auth/AuthProvider";
-
+import ClientProviders from "@/app/providers/ClientProviders";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,17 +24,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen min-w-screen`}
       >
-        <AuthProvider>
+        <ClientProviders>
           <div className="min-h-screen w-full">
             <ConditionalNav />
             {children}
-            <Toaster />
           </div>
-        </AuthProvider>
+        </ClientProviders>
       </body>
     </html>
   );

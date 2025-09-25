@@ -15,7 +15,9 @@ const Page = () => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [loading, setLoading] = useState(true); 
   const [bookToEdit, setBookToEdit] = useState<Book | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
